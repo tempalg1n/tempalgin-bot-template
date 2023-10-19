@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "dungeon-master"
+version = "0.1.0"
+description = ""
+authors = ["ivanm <ivanmuranov595@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+aiogram = "^3.1.1"
+redis = "^5.0.1"
+sqlalchemy = "^2.0.22"
+python-dotenv = "^1.0.0"
+asyncpg = "^0.28.0"
+python-i18n = "^0.3.9"
+aiogram-dialog = "^2.0.0"
+fluent-runtime = "^0.4.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
