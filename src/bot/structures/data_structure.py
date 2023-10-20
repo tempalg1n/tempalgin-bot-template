@@ -7,6 +7,7 @@ transfer throw Dispatcher->Middlewares->Handlers.
 from typing import TypedDict
 
 from aiogram import Bot
+from fluent.runtime import FluentLocalization
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.bot.structures.role import Role
@@ -20,3 +21,4 @@ class TransferData(TypedDict):
     db: Database
     bot: Bot
     role: Role
+    i18n: FluentLocalization

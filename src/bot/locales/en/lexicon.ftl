@@ -1,3 +1,3 @@
 Demo-button = demo
-hello = Hi!
+Hello-user = Hi!
 Cancel = Cancel

@@ -1,5 +1,8 @@
 """Chat model file."""
+import datetime
+
 import sqlalchemy as sa
+from sqlalchemy import DateTime, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .base import Base
@@ -27,4 +30,10 @@ class Chat(Base):
         unique=False,
         nullable=True,
     )
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
     """ Foreign key to user (it can has effect only in private chats) """
+    last_activity: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )

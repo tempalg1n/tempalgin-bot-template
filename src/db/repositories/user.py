@@ -1,6 +1,6 @@
 """User repository file."""
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.bot.structures.role import Role
@@ -17,15 +17,15 @@ class UserRepo(Repository[User]):
         super().__init__(type_model=User, session=session)
 
     async def new(
-        self,
-        user_id: int,
-        user_name: str | None = None,
-        first_name: str | None = None,
-        second_name: str | None = None,
-        language_code: str | None = None,
-        is_premium: bool | None = False,
-        role: Role | None = Role.USER,
-        user_chat: type[Base] = None,
+            self,
+            user_id: int,
+            user_name: str | None = None,
+            first_name: str | None = None,
+            second_name: str | None = None,
+            language_code: str | None = None,
+            is_premium: bool | None = False,
+            role: Role | None = Role.USER,
+            user_chat: type[Base] = None,
     ) -> None:
         """Insert a new user into the database.
 
@@ -33,7 +33,7 @@ class UserRepo(Repository[User]):
         :param user_name: Telegram username
         :param first_name: Telegram profile first name
         :param second_name: Telegram profile second name
-        :param language_code: Telegram profile locales code
+        :param language_code: Telegram profile language code
         :param is_premium: Telegram user premium status
         :param role: User's role
         :param user_chat: Telegram chat with user.
@@ -56,3 +56,26 @@ class UserRepo(Repository[User]):
         return await self.session.scalar(
             select(User.role).where(User.user_id == user_id).limit(1)
         )
+
+    async def get_usernames(self):
+        stmt = select(User.user_name, User.user_id)
+        return await self.session.scalars(stmt)
+
+    async def get_all_users(self, limit: int = 10, page: int = 1) -> list[User]:
+        # skip = (page - 1) * limit
+        stmt = select(User)
+        return [user for user in await self.session.scalars(stmt)]
+
+    async def get_by_tg_id(self, tg_id: int):
+        return await self.session.scalar(
+            select(User).where(User.user_id == tg_id).limit(1)
+        )
+
+    async def set_role(self, user_id: int, role: Role):
+        stmt = (
+            update(User).
+            where(User.user_id == user_id).
+            values({"role": role})
+        )
+        await self.session.execute(stmt)
+        await self.session.commit()

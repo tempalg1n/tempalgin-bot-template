@@ -1,6 +1,9 @@
 """User model file."""
+import datetime
+
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
+from sqlalchemy import DateTime, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.bot.structures.role import Role
@@ -29,7 +32,7 @@ class User(Base):
     )
     """ Telegram profile second name """
     is_premium: Mapped[bool] = mapped_column(
-        sa.Boolean, unique=False, nullable=False
+        sa.Boolean, unique=False, nullable=True
     )
     """ Telegram user premium status """
     role: Mapped[Role] = mapped_column(sa.Enum(Role), default=Role.USER)
@@ -38,6 +41,10 @@ class User(Base):
         sa.ForeignKey('chat.id'), unique=False, nullable=False
     )
     user_chat: Mapped[Chat] = orm.relationship(
-        'Chat', uselist=False, lazy='joined'
+        "Chat", uselist=False, lazy='joined', foreign_keys=user_chat_fk
     )
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
     """ Telegram chat with user """

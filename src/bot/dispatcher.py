@@ -26,7 +26,7 @@ def make_i18n_middleware():
     ))
     l10ns = {
         locale: FluentLocalization(
-            [locale, DEFAULT_LOCALE], ["main.ftl"], loader,
+            [locale, DEFAULT_LOCALE], ["lexicon.ftl"], loader,
         )
         for locale in LOCALES
     }

@@ -1,4 +1,5 @@
 """Chat repository file."""
+from sqlalchemy import update, select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..models import Chat
@@ -32,3 +33,12 @@ class ChatRepo(Repository[Chat]):
             )
         )
         return new_chat
+
+    async def activity_update(self, chat_id: int):
+        stmt = update(Chat).where(Chat.chat_id == chat_id).values(last_activity=func.now())
+        await self.session.execute(stmt)
+        await self.session.commit()
+
+    async def get_private_chats(self):
+        stmt = select(Chat.chat_id).where(Chat.chat_type == 'private')
+        return await self.session.scalars(stmt)
