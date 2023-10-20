@@ -4,6 +4,7 @@ import logging
 
 from aiogram import Bot
 from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.types import BotCommand
 from aiogram_dialog import setup_dialogs
 
 from redis.asyncio.client import Redis
@@ -13,12 +14,26 @@ from src.bot.structures.data_structure import TransferData
 from src.configuration import conf
 from src.db.database import create_async_engine
 
+COMMANDS = {
+    'profile': 'My account',
+    'help': 'Get additional info',
+}
+
 
 def register_middlewares(dp) -> None:
     i18n_middleware: I18nMiddleware = make_i18n_middleware()
 
     dp.message.middleware(i18n_middleware)
     dp.callback_query.middleware(i18n_middleware)
+
+
+async def set_main_menu(bot: Bot):
+    main_menu_commands = [BotCommand(
+        command=command,
+        description=description
+    ) for command,
+    description in COMMANDS.items()]
+    await bot.set_my_commands(main_menu_commands)
 
 
 async def start_bot():

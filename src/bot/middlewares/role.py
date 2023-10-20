@@ -20,5 +20,5 @@ class RoleMiddleware(BaseMiddleware):
     ) -> Any:
         """This method calls each update of Message or CallbackQuery type."""
         db: Database = data['db']
-        data['role'] = await db.user.get_role()
+        data['role'] = await db.user.get_role(event.from_user.id)
         return await handler(event, data)
