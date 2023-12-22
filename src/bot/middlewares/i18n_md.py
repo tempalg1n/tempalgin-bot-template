@@ -5,6 +5,7 @@ from aiogram.types import CallbackQuery, Message
 from fluent.runtime import FluentLocalization
 
 from src.bot.logic.dialogs.translation.i18n_format import I18N_FORMAT_KEY
+from src.db.models import User
 
 
 class I18nMiddleware(BaseMiddleware):
@@ -27,8 +28,10 @@ class I18nMiddleware(BaseMiddleware):
             data: Dict[str, Any],
     ) -> Any:
         # some language/locale retrieving logic
-        if event.from_user:
-            lang = event.from_user.language_code
+        user: User = data['user_object']
+        lang = user.language_code
+        if lang not in self.l10ns:
+            lang = self.default_lang
         else:
             lang = self.default_lang
         if lang not in self.l10ns:

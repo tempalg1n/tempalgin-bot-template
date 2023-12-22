@@ -34,6 +34,9 @@ class User(Base):
     is_premium: Mapped[bool] = mapped_column(
         sa.Boolean, unique=False, nullable=True
     )
+    language_code: Mapped[str] = mapped_column(
+        sa.Text, unique=False, nullable=False, server_default='ru'
+    )
     """ Telegram user premium status """
     role: Mapped[Role] = mapped_column(sa.Enum(Role), default=Role.USER)
     """ User's role """
