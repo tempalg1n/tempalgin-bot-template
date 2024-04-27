@@ -4,10 +4,11 @@ from typing import Any
 
 from aiogram import BaseMiddleware
 from aiogram.types import CallbackQuery, Message
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
 from src.bot.structures.data_structure import TransferData
-from src.db.database import Database
+from src.configuration import conf
+from src.db.database import Database, create_async_engine
 
 
 class DatabaseMiddleware(BaseMiddleware):
@@ -20,6 +21,9 @@ class DatabaseMiddleware(BaseMiddleware):
         data: TransferData,
     ) -> Any:
         """This method calls every update."""
-        async with AsyncSession(bind=data['engine']) as session:
+        engine: AsyncEngine = data.get('engine') or create_async_engine(
+            url=conf.db.build_connection_str()
+        )
+        async with AsyncSession(bind=engine) as session:
             data['db'] = Database(session)
             return await handler(event, data)

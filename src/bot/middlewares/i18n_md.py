@@ -28,7 +28,7 @@ class I18nMiddleware(BaseMiddleware):
             data: Dict[str, Any],
     ) -> Any:
         # some language/locale retrieving logic
-        user: User = data['user_object']
+        user: User = data['user']
         lang = user.language_code
         if lang not in self.l10ns:
             lang = self.default_lang

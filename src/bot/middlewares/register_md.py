@@ -1,11 +1,16 @@
-from typing import Callable, Dict, Any, Awaitable, Union
+import logging
+from typing import Any, Awaitable, Callable, Dict, Union
 
 from aiogram import BaseMiddleware
+from aiogram.types import CallbackQuery, Message
+from aiogram.types import User as TelegramUser
+from sqlalchemy import Row
 
-from aiogram.types import Message, CallbackQuery
 from src.bot.structures.role import Role
 from src.db import Database
-from src.db.models import User, Chat
+from src.db.models import Chat, User
+
+logger = logging.getLogger(__name__)
 
 
 class RegisterCheck(BaseMiddleware):
@@ -15,38 +20,41 @@ class RegisterCheck(BaseMiddleware):
     """
 
     async def __call__(
-            self,
-            handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
-            event: Union[Message, CallbackQuery],
-            data: Dict[str, Any]
+        self,
+        handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
+        event: Union[Message, CallbackQuery],
+        data: Dict[str, Any],
     ) -> Any:
-        """ Сама функция для обработки вызова """
-        # if event.web_app_data:
-        #     return await handler(event, data)
-
-        db: Database = data["db"]
-        user = event.from_user
-        user_db: User = await db.user.get_by_tg_id(user.id)
-        # chat_db: Chat = await db.chat.get_by_where(whereclause=f'self.type_model.chat_id == {event.chat.id}')
-        if not user_db:
-            chat_model: Chat = Chat(
-                chat_id=event.chat.id,
-                chat_type=event.chat.type,
-                title=event.chat.title,
-                chat_name=event.chat.username
-            )
-            user_model: User = User(
-                user_id=user.id,
-                user_name=user.username,
-                first_name=user.first_name,
-                second_name=user.last_name,
-                is_premium=user.is_premium,
-                role=Role.USER,
-                user_chat=chat_model
-            )
-            db.session.add(user_model)
-            await db.session.commit()
+        """Сама функция для обработки вызова"""
+        db: Database = data['db']
+        tg_user: TelegramUser = event.from_user
+        user: Row = await db.user.get_by_where(User.user_id == tg_user.id)
+        if user:
+            data['user'] = user[0]
+            logger.debug('User from database injected')
         else:
-            await db.chat.activity_update(event.from_user.id)
+            logger.info('User not found. Creating new, but first getting chat from db...')
+            chat: Chat | None = await db.chat.get_by_where(Chat.chat_id == event.chat.id)
+            if not chat:
+                chat: Chat = await db.chat.new(
+                    chat_id=event.chat.id,
+                    chat_type=event.chat.type,
+                    title=event.chat.title,
+                    chat_name=event.chat.username if event.chat.username else 'unknown_chat',
+                )
+                logger.info('Chat not found. New chat added to session')
+            user: User = await db.user.new(
+                user_id=tg_user.id,
+                user_name=tg_user.username,
+                first_name=tg_user.first_name,
+                language_code=tg_user.language_code,
+                second_name=tg_user.last_name,
+                is_premium=tg_user.is_premium,
+                role=Role.USER,
+                user_chat=chat,
+            )
+            logger.info('New user added to session')
+            await db.session.commit()
+            logger.info('New user created')
 
         return await handler(event, data)

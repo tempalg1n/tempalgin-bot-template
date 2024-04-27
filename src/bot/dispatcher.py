@@ -4,7 +4,7 @@ import os
 from aiogram import Dispatcher
 from aiogram.fsm.storage.base import BaseEventIsolation, BaseStorage
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.fsm.storage.redis import RedisStorage
+from aiogram.fsm.storage.redis import RedisStorage, DefaultKeyBuilder
 from aiogram.fsm.strategy import FSMStrategy
 from fluent.runtime import FluentResourceLoader, FluentLocalization
 from redis.asyncio.client import Redis
@@ -34,7 +34,7 @@ def make_i18n_middleware():
 
 
 def get_redis_storage(
-        redis: Redis, state_ttl=conf.redis.state_ttl, data_ttl=conf.redis.data_ttl
+    redis: Redis, state_ttl=conf.redis.state_ttl, data_ttl=conf.redis.data_ttl
 ):
     """This function create redis storage or get it forcely from configuration.
 
@@ -45,7 +45,12 @@ def get_redis_storage(
     for Redis database)
     :return: Created Redis storage.
     """
-    return RedisStorage(redis=redis, state_ttl=state_ttl, data_ttl=data_ttl)
+    return RedisStorage(
+        redis=redis,
+        state_ttl=state_ttl,
+        data_ttl=data_ttl,
+        key_builder=DefaultKeyBuilder(with_destiny=True),
+    )
 
 
 def get_dispatcher(

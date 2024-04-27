@@ -1,0 +1,19 @@
+[Unit]
+Description=template-bot
+After=syslog.target
+After=network.target
+Requires=postgresql.service
+Requires=redis.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/bots/template-bot
+Environment=PYTHONPATH=/root/bots/template-bot
+ExecStart=/root/.local/bin/poetry run python3.11 src/bot
+Restart=on-failure
+RestartSec=10
+
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,19 @@
+[Unit]
+Description=template-scheduler
+After=syslog.target
+After=network.target
+Requires=postgresql.service
+Requires=redis.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/bots/template-bot
+Environment=PYTHONPATH=/root/bots/template-bot
+ExecStart=/root/.local/bin/poetry run taskiq template src.template.broker:scheduler
+Restart=on-failure
+RestartSec=10
+
+
+[Install]
+WantedBy=multi-user.target
