@@ -9,9 +9,8 @@ from aiogram_dialog import setup_dialogs
 
 from redis.asyncio.client import Redis
 from src.bot.dispatcher import get_dispatcher, get_redis_storage, make_i18n_middleware
-from src.bot.middlewares.database_md import DatabaseMiddleware
+from src.bot.middlewares import middlewares
 from src.bot.middlewares.i18n_md import I18nMiddleware
-from src.bot.middlewares.register_md import RegisterCheck
 from src.bot.structures.data_structure import TransferData
 from src.configuration import conf
 from src.db.database import create_async_engine
@@ -24,15 +23,10 @@ COMMANDS = {
 
 def register_middlewares(dp) -> None:
     i18n_middleware: I18nMiddleware = make_i18n_middleware()
-
-    dp.message.middleware(i18n_middleware)
-    dp.callback_query.middleware(i18n_middleware)
-
-    dp.callback_query.outer_middleware(DatabaseMiddleware())
-    dp.message.outer_middleware(DatabaseMiddleware())
-
-    dp.callback_query.outer_middleware(RegisterCheck())
-    dp.message.outer_middleware(RegisterCheck())
+    for observer in dp.observers.values():
+        observer.outer_middleware(i18n_middleware)
+        for middleware in middlewares:
+            observer.outer_middleware(middleware)
 
 
 async def set_main_menu(bot: Bot):
