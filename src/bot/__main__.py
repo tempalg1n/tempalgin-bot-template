@@ -12,12 +12,14 @@ from src.bot.dispatcher import get_dispatcher, get_redis_storage, make_i18n_midd
 from src.bot.middlewares import middlewares
 from src.bot.middlewares.i18n_md import I18nMiddleware
 from src.bot.structures.data_structure import TransferData
+from src.bot.structures.enums import GPTModel
 from src.configuration import conf
 from src.db.database import create_async_engine
+from src.gpt.client import GPT
 
 COMMANDS = {
-    'profile': 'My account',
-    'help': 'Get additional info',
+    'start': 'Reset bot',
+    'tekla': 'Tekla assistance',
 }
 
 
@@ -59,7 +61,8 @@ async def start_bot():
         bot,
         allowed_updates=dp.resolve_used_update_types(),
         **TransferData(
-            engine=create_async_engine(url=conf.db.build_connection_str())
+            engine=create_async_engine(url=conf.db.build_connection_str()),
+            gpt=GPT(api_key=conf.openai.api_key, model=GPTModel.OMNI)
         )
     )
 

@@ -1,5 +1,5 @@
 [Unit]
-Description=template-workers
+Description=kxm-helper-workers
 After=syslog.target
 After=network.target
 Requires=postgresql.service
@@ -8,8 +8,8 @@ Requires=redis.service
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/root/bots/template-bot
-Environment=PYTHONPATH=/root/bots/template-bot
+WorkingDirectory=/root/bots/kxm-helper
+Environment=PYTHONPATH=/root/bots/kxm-helper
 ExecStart=/root/.local/bin/poetry run taskiq worker src.scheduler.broker:broker
 Restart=on-failure
 RestartSec=10

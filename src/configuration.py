@@ -60,6 +60,12 @@ class BotConfig:
 
 
 @dataclass
+class OpenAIConfig:
+    api_key: str = getenv('OPENAI_API_KEY')
+    tekla_assistant: str = getenv('TEKLA_HELPER_ID')
+
+
+@dataclass
 class Configuration:
     """All in one configuration's class."""
 
@@ -69,6 +75,7 @@ class Configuration:
     db = DatabaseConfig()
     redis = RedisConfig()
     bot = BotConfig()
+    openai = OpenAIConfig()
 
 
 conf = Configuration()
