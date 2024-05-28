@@ -53,10 +53,28 @@ class BotConfig:
     """Bot configuration."""
 
     token: str = getenv('BOT_TOKEN')
-    DEFAULT_LOCALE: str = 'en'
+    DEFAULT_LOCALE: str = 'ru'
     LOCALES: list[str] = field(default_factory=lambda: [
         'en', 'ru'
     ])
+
+
+@dataclass
+class ProxyConfig:
+    port: str = getenv('PROXY_PORT')
+    ip: str = getenv('PROXY_IP')
+    login: str = getenv('PROXY_LOGIN')
+    password: str = getenv('PROXY_PASSWORD')
+
+    def build_connection_str(self) -> str:
+        """This function build a connection string."""
+        return f'http://{self.login}:{self.password}@{self.ip}:{self.port}'
+
+    def build_proxy_payload(self) -> dict:
+        return {
+            "https://": self.build_connection_str(),
+            "http://": self.build_connection_str()
+        }
 
 
 @dataclass
@@ -76,6 +94,7 @@ class Configuration:
     redis = RedisConfig()
     bot = BotConfig()
     openai = OpenAIConfig()
+    proxy = ProxyConfig()
 
 
 conf = Configuration()

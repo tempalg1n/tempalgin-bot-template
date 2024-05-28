@@ -17,13 +17,11 @@ class ThreadRepo(Repository[ThreadModel]):
         self,
         thread_id: str = None,
         user: User = None,
-        tag: str = None,
     ) -> ThreadModel:
         """Insert a new object into the database."""
         model = ThreadModel(
             thread_id=thread_id,
             user=user,
-            tag=tag,
         )
         return await self.session.merge(model)
 

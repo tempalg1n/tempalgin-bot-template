@@ -18,7 +18,7 @@ async def answer_getter(dialog_manager: DialogManager, **kwargs):
         await bot.send_chat_action(dialog_manager.event.from_user.id, ChatAction.TYPING)
     cost: int = dialog_manager.dialog_data.get('cost')
     if cost:
-        user: User = dialog_manager.middleware_data['user_object']
+        user: User = dialog_manager.middleware_data['user']
         if user.balance > cost:
             user.balance -= cost
         else:
