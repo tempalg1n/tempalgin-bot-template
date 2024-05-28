@@ -50,7 +50,7 @@ async def start_bot():
             port=conf.redis.port,
         )
     )
-    dp = get_dispatcher(storage=MemoryStorage())
+    dp = get_dispatcher(storage=MemoryStorage() if conf.debug else storage)
 
     register_middlewares(dp)
     setup_dialogs(dp)
