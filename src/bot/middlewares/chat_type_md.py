@@ -10,38 +10,35 @@ from src.bot.structures.data_structure import TransferData
 
 class ChatTypeMiddleware(BaseMiddleware):
     async def __call__(
-        self,
-        handler: Callable[[TelegramObject, dict[str, Any]], Awaitable[Any]],
-        event: Message | CallbackQuery | DialogUpdateEvent,
-        data: TransferData,
+            self,
+            handler: Callable[[TelegramObject, dict[str, Any]], Awaitable[Any]],
+            event: Message | CallbackQuery | DialogUpdateEvent,
+            data: TransferData,
     ) -> Any:
         """This method calls each update of Message or CallbackQuery type."""
-        if isinstance(event, CallbackQuery) or isinstance(
-            event, DialogUpdateEvent
-        ):
-            return await handler(event, data)
-
-        if isinstance(event, Message):
+        if hasattr(event, 'message'):
             bot: Bot = data['bot']
             bot_instance: User = await bot.get_me()
-            if event.chat.type == 'private':
-                return await handler(event, data)
-            elif event.chat.type in ['group', 'supergroup']:
-                if (
-                    event.reply_to_message
-                    and event.reply_to_message.from_user.id == bot_instance.id
-                ):
+            if event.message:
+                if event.message.chat.type == 'private':
                     return await handler(event, data)
-                if event.caption:
-                    message: str = event.caption
-                elif event.text:
-                    message: str = event.text
-                elif hasattr(event, 'message_text'):
-                    if event.message_text:
-                        message: str = event.message_text
+                elif event.message.chat.type in ['group', 'supergroup']:
+                    if (
+                            event.message.reply_to_message
+                            and event.message.reply_to_message.from_user.id == bot_instance.id
+                    ):
+                        return await handler(event, data)
+                    if event.message.caption:
+                        message: str = event.message.caption
+                    elif event.message.text:
+                        message: str = event.message.text
+                    elif hasattr(event.message, 'message_text'):
+                        if event.message.message_text:
+                            message: str = event.message.message_text
+                        else:
+                            return
                     else:
                         return
-                else:
-                    return
-                if bot_instance.username in message:
-                    return await handler(event, data)
+                    if bot_instance.username not in message:
+                        return
+        return await handler(event, data)
