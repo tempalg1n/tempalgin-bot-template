@@ -26,7 +26,7 @@ async def start_designer_thread_text_handler(
     user: User = manager.middleware_data['user']
     if user.balance <= 0:
         await message.reply('Похоже, у вас не хватает токенов 🤷‍♂️')
-        # await manager.start(PaymentSG.choose_amount, mode=StartMode.RESET_STACK)
+        await manager.done()
         return
     db: Database = manager.middleware_data['db']
     gpt: GPT = manager.middleware_data['gpt']
@@ -73,6 +73,7 @@ async def user_text_handler(
         no_tokens: bool = bool(manager.dialog_data.get('no_tokens'))
         if no_tokens:
             await message.reply('Похоже, у вас не хватает токенов 🤷‍♂️')
+            await manager.done()
             return
         await message.reply('⏳ Подождите, пока бот обработает ваш ответ')
         return
