@@ -1,5 +1,5 @@
 [Unit]
-Description=kxm-helper-bot
+Description=template-bot
 After=syslog.target
 After=network.target
 Requires=postgresql.service
@@ -8,8 +8,8 @@ Requires=redis.service
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/root/bots/kxm-helper
-Environment=PYTHONPATH=/root/bots/kxm-helper
+WorkingDirectory=/root/bots/template
+Environment=PYTHONPATH=/root/bots/template
 ExecStart=/root/.local/bin/poetry run python3.11 src/bot
 Restart=on-failure
 RestartSec=10

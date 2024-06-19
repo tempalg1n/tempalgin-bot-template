@@ -21,7 +21,6 @@ from src.gpt.client import GPT
 
 COMMANDS = {
     'start': 'Reset bot',
-    'tekla': 'Tekla assistance',
 }
 
 
@@ -67,7 +66,6 @@ async def start_bot():
         allowed_updates=dp.resolve_used_update_types(),
         **TransferData(
             engine=create_async_engine(url=conf.db.build_connection_str()),
-            gpt=GPT(api_key=conf.openai.api_key, model=GPTModel.OMNI)
         )
     )
 

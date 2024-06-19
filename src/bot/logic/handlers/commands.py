@@ -17,8 +17,3 @@ async def start_handler(message: types.Message, dialog_manager: DialogManager):
     await message.answer('💡', reply_markup=ReplyKeyboardRemove())
     await dialog_manager.start(StartSG.greeting, mode=StartMode.NORMAL)
 
-
-@commands_handler_router.message(Command('tekla'))
-async def tekla_handler(message: types.Message, dialog_manager: DialogManager):
-    """Tekla command handler."""
-    await dialog_manager.start(AssistantSG.init, mode=StartMode.NORMAL)

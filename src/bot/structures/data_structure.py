@@ -23,4 +23,3 @@ class TransferData(TypedDict):
     bot: Bot
     role: Role
     i18n: FluentLocalization
-    gpt: GPT
