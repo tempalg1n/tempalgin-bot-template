@@ -8,16 +8,20 @@ from aiogram.types import BotCommand
 from aiogram_dialog import setup_dialogs
 
 from redis.asyncio.client import Redis
+from sulguk import AiogramSulgukMiddleware
+
 from src.bot.dispatcher import get_dispatcher, get_redis_storage, make_i18n_middleware
 from src.bot.middlewares import middlewares
 from src.bot.middlewares.i18n_md import I18nMiddleware
 from src.bot.structures.data_structure import TransferData
+from src.bot.structures.enums import GPTModel
 from src.configuration import conf
 from src.db.database import create_async_engine
+from src.gpt.client import GPT
 
 COMMANDS = {
-    'profile': 'My account',
-    'help': 'Get additional info',
+    'start': 'Reset bot',
+    'tekla': 'Tekla assistance',
 }
 
 
@@ -51,15 +55,19 @@ async def start_bot():
         )
     )
     dp = get_dispatcher(storage=MemoryStorage() if conf.debug else storage)
+    await set_main_menu(bot)
 
-    register_middlewares(dp)
+
+    bot.session.middleware(AiogramSulgukMiddleware())
     setup_dialogs(dp)
+    register_middlewares(dp)
 
     await dp.start_polling(
         bot,
         allowed_updates=dp.resolve_used_update_types(),
         **TransferData(
-            engine=create_async_engine(url=conf.db.build_connection_str())
+            engine=create_async_engine(url=conf.db.build_connection_str()),
+            gpt=GPT(api_key=conf.openai.api_key, model=GPTModel.OMNI)
         )
     )
 

@@ -4,7 +4,7 @@ from aiogram.dispatcher.middlewares.base import BaseMiddleware
 from aiogram.types import CallbackQuery, Message
 from fluent.runtime import FluentLocalization
 
-from src.bot.logic.dialogs.translation.i18n_format import I18N_FORMAT_KEY
+from src.bot.utils.translation.i18n_format import I18N_FORMAT_KEY
 from src.db.models import User
 
 
@@ -28,14 +28,7 @@ class I18nMiddleware(BaseMiddleware):
             data: Dict[str, Any],
     ) -> Any:
         # some language/locale retrieving logic
-        user: User = data['user']
-        lang = user.language_code
-        if lang not in self.l10ns:
-            lang = self.default_lang
-        else:
-            lang = self.default_lang
-        if lang not in self.l10ns:
-            lang = self.default_lang
+        lang = self.default_lang
 
         l10n = self.l10ns[lang]
         # we use fluent.runtime here, but you can create custom functions

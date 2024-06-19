@@ -30,6 +30,9 @@ class User(Base):
     second_name: Mapped[str] = mapped_column(
         sa.Text, unique=False, nullable=True
     )
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
     """ Telegram profile second name """
     is_premium: Mapped[bool] = mapped_column(
         sa.Boolean, unique=False, nullable=True
@@ -44,10 +47,9 @@ class User(Base):
         sa.ForeignKey('chat.id'), unique=False, nullable=False
     )
     user_chat: Mapped[Chat] = orm.relationship(
-        "Chat", uselist=False, lazy='joined', foreign_keys=user_chat_fk
+        'Chat', uselist=False, lazy='joined', foreign_keys=user_chat_fk
     )
-    created_at: Mapped[datetime.datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
-    )
-
     """ Telegram chat with user """
+    balance: Mapped[int] = mapped_column(
+        sa.BigInteger, unique=False, nullable=False, server_default='20000'
+    )

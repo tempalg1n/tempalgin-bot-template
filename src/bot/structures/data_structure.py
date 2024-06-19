@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.bot.structures.role import Role
 from src.db.database import Database
+from src.gpt.client import GPT
 
 
 class TransferData(TypedDict):
@@ -22,3 +23,4 @@ class TransferData(TypedDict):
     bot: Bot
     role: Role
     i18n: FluentLocalization
+    gpt: GPT
